@@ -24,7 +24,7 @@ Datenmodell 1.13.0, Migrationen bis `0051` (laufen beim ersten Start automatisch
 
 ```sh
 apt-get update && apt-get install -y git          # Docker/NVIDIA nur, falls noch nicht vorhanden
-git clone https://github.com/<owner>/<dieses-repo>.git /root/doctus && cd /root/doctus
+git clone https://github.com/maxdedecke/doctus-deploy-1.git /root/doctus && cd /root/doctus
 
 docker login ghcr.io -u maxdedecke                  # Passwort: Lese-Token
 ./pull-images.sh
