@@ -1,6 +1,6 @@
 # Doctus Pilot – Begleitdateien (pilot-20261122)
 
-Alles, was die Deployment-Maschine neben den drei Images braucht. Images und Stand: Commit `f1a967d`,
+Alles, was die Deployment-Maschine neben den drei Images braucht. Images und Stand: Commit `05e599e`,
 Datenmodell 1.13.0, Migrationen bis `0051` (laufen beim ersten Start automatisch).
 
 | Datei | Zweck |
