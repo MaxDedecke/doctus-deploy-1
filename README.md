@@ -19,12 +19,15 @@ Datenmodell 1.13.0, Migrationen bis `0051` (laufen beim ersten Start automatisch
 - NVIDIA-Treiber und NVIDIA Container Toolkit: `docker info | grep -i nvidia` muss die Runtime zeigen.
 - Internet zu `ghcr.io`, Docker Hub (PostgreSQL, Valkey, Ollama per Digest) und `ollama.com` (Modelle, ~20 GB).
 - Lese-Token (classic, `read:packages`; `repo`, falls dieses Repository damit geklont wird).
+- Betrieb als normaler Nutzer (z. B. `doctusops`) ohne sudo: Ein Administrator nimmt ihn einmalig in die Gruppe
+  `docker` auf (`usermod -aG docker doctusops`, danach neu anmelden); `docker ps` muss dann ohne sudo gehen.
+  Die Gruppe `docker` ist gleichwertig zu root auf dem Host. Git, Docker und NVIDIA-Toolkit muss der
+  Administrator vorab installieren.
 
 ## Ablauf
 
 ```sh
-apt-get update && apt-get install -y git          # Docker/NVIDIA nur, falls noch nicht vorhanden
-git clone https://github.com/maxdedecke/doctus-deploy-1.git /root/doctus && cd /root/doctus
+git clone https://github.com/maxdedecke/doctus-deploy-1.git ~/doctus && cd ~/doctus
 
 docker login ghcr.io -u maxdedecke                  # Passwort: Lese-Token
 ./pull-images.sh
@@ -42,6 +45,9 @@ curl -fsS http://localhost:8000/health && curl -fsS http://localhost:8000/versio
 ```
 
 `--no-build` ist Pflicht: Die Compose-Datei enthält Build-Abschnitte für Verzeichnisse, die es hier nicht gibt.
+
+Die Container laufen intern als root; was sie unter `data/` und `repos/` anlegen, gehört daher root. Ohne sudo
+löscht man es über einen Container, z. B. `docker run --rm -v "$PWD/data:/d" alpine rm -rf /d/logs`.
 
 ## Prüfen
 
