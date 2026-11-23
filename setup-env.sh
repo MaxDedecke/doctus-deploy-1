@@ -27,6 +27,8 @@ sed -i \
   -e "s|^OLLAMA_CONTEXT_LENGTH=.*|OLLAMA_CONTEXT_LENGTH=65536|" \
   -e "s|^OLLAMA_NUM_PARALLEL=.*|OLLAMA_NUM_PARALLEL=3|" \
   -e "s|^INFERENCE_MAX_CONCURRENCY=.*|INFERENCE_MAX_CONCURRENCY=3|" \
+  -e "s|^DEPLOYER_ENABLED=.*|DEPLOYER_ENABLED=true|" \
+  -e "s|^DEPLOYER_TOKEN=.*|DEPLOYER_TOKEN=$(openssl rand -hex 32)|" \
   .env
-echo "COMPOSE_PROFILES=local-ollama" >> .env
+echo "COMPOSE_PROFILES=local-ollama,deployer" >> .env
 echo ".env angelegt. Jetzt sichern (enthält MASTER_ENCRYPTION_KEY), dann: docker compose up -d --no-build"
