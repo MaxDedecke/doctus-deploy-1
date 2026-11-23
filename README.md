@@ -37,8 +37,10 @@ docker logout ghcr.io
 cp .env /sicherer/ort/doctus.env                     # sofort sichern: ohne MASTER_ENCRYPTION_KEY ist alles unlesbar
 
 docker compose up -d --no-build
-docker exec doctus-ollama ollama pull bge-m3
-docker exec doctus-ollama ollama pull qwen3-coder:30b     # ~19 GB
+docker exec doctus-ollama ollama pull hf.co/gpustack/bge-m3-GGUF:Q4_K_M
+docker exec doctus-ollama ollama cp hf.co/gpustack/bge-m3-GGUF:Q4_K_M bge-m3
+docker exec doctus-ollama ollama pull hf.co/lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M   # ~19 GB
+docker exec doctus-ollama ollama cp hf.co/lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M qwen3-coder:30b
 docker compose logs backend-api | grep -A3 "Erster Start" # Admin-Passwort, wird nur einmal angezeigt
 docker compose ps
 curl -fsS http://localhost:8000/health && curl -fsS http://localhost:8000/version
