@@ -8,7 +8,7 @@ Datenmodell 1.13.0, Migrationen bis `0051` (laufen beim ersten Start automatisch
 | `docker-compose.yml`, `docker-compose.gpu.yml` | Dienste; die GPU-Datei gibt Ollama die Grafikkarten |
 | `.env.example` | Vorlage der Einstellungen (nie eine ausgefüllte `.env` einchecken) |
 | `config/features.json` | Funktionsschalter |
-| `pull-images.sh` | Images aus `ghcr.io` ziehen und lokal benennen (inkl. Deployer für „Lokales Deployment“) |
+| `pull-images.sh` | Images aus `ghcr.io` ziehen und lokal benennen |
 | `setup-env.sh` | `.env` einmalig für den Pilot erzeugen (GPU, `qwen3-coder:30b`, 64k, 3 parallel) |
 | `generate_diagnostics.py` | Diagnosepaket bei Problemen |
 | `test-remote-inference.sh`, `check_remote_inference.py` | Nur für einen getrennten Modellserver |
@@ -50,23 +50,6 @@ curl -fsS http://localhost:8000/health && curl -fsS http://localhost:8000/versio
 
 Die Container laufen intern als root; was sie unter `data/` und `repos/` anlegen, gehört daher root. Ohne sudo
 löscht man es über einen Container, z. B. `docker run --rm -v "$PWD/data:/d" alpine rm -rf /d/logs`.
-
-## Lokales Deployment (Einstellungen > KI)
-
-Die Option erscheint nur, wenn der Dienst `deployer` läuft. `setup-env.sh` schaltet ihn ein. Bei einer schon
-angelegten `.env` von Hand nachrüsten:
-
-```sh
-git pull && ./pull-images.sh                 # holt auch doctus-deployer (Login wie oben)
-sed -i 's/^DEPLOYER_ENABLED=.*/DEPLOYER_ENABLED=true/' .env
-sed -i "s/^DEPLOYER_TOKEN=.*/DEPLOYER_TOKEN=$(openssl rand -hex 32)/" .env
-sed -i 's/^COMPOSE_PROFILES=.*/COMPOSE_PROFILES=local-ollama,deployer/' .env
-docker compose up -d --no-build
-```
-
-Der Deployer hat über `docker.sock` Root-Rechte auf dem Host. Modelle, die er startet, teilen sich die
-Grafikkarten mit dem festen Ollama-Dienst: Läuft dort schon `qwen3-coder:30b`, ist für ein zweites großes
-Modell kein Platz.
 
 ## Prüfen
 

@@ -4,7 +4,7 @@
 set -eu
 OWNER=${OWNER:-maxdedecke}
 V=${DOCTUS_VERSION:-pilot-20261122}
-for i in backend-api parser-worker frontend deployer; do
+for i in backend-api parser-worker frontend; do
   docker pull "ghcr.io/$OWNER/doctus-$i:$V"
   docker tag "ghcr.io/$OWNER/doctus-$i:$V" "doctus-$i:$V"
 done
