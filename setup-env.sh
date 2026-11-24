@@ -2,7 +2,7 @@
 # Erzeugt die .env EINMALIG für den Pilot (GPU, qwen3-coder:30b, 64k Kontext, 3 parallele Anfragen).
 # Ein zweiter Lauf würde neue Schlüssel erzeugen und die Datenbank unlesbar machen; deshalb bricht er ab.
 set -eu
-V=${DOCTUS_VERSION:-pilot-20261122}
+V=${DOCTUS_VERSION:-pilot-20261124}
 ADDR=${1:?"Aufruf: ./setup-env.sh <Server-Adresse, z. B. 10.0.0.5 oder doctus.firma.local>"}
 if [ -e .env ]; then
   echo ".env existiert bereits; nichts geändert." >&2
