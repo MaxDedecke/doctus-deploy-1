@@ -2,17 +2,17 @@
 # Erzeugt die .env EINMALIG für den Pilot (GPU, qwen3-coder:30b, 64k Kontext, 3 parallele Anfragen).
 # Ein zweiter Lauf würde neue Schlüssel erzeugen und die Datenbank unlesbar machen; deshalb bricht er ab.
 set -eu
-V=${DOCTUS_VERSION:-pilot-20261124}
-ADDR=${1:?"Aufruf: ./setup-env.sh <Server-Adresse, z. B. 10.0.0.5 oder doctus.firma.local>"}
+V=${CODENA_VERSION:-pilot-20261126}
+ADDR=${1:?"Aufruf: ./setup-env.sh <Server-Adresse, z. B. 10.0.0.5 oder codena.firma.local>"}
 if [ -e .env ]; then
   echo ".env existiert bereits; nichts geändert." >&2
   exit 1
 fi
 cp .env.example .env && chmod 600 .env
-MK=$(docker run --rm --network none --entrypoint python "doctus-backend-api:$V" -c \
+MK=$(docker run --rm --network none --entrypoint python "codena-backend-api:$V" -c \
   'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')
 sed -i \
-  -e "s|^DOCTUS_VERSION=.*|DOCTUS_VERSION=$V|" \
+  -e "s|^CODENA_VERSION=.*|CODENA_VERSION=$V|" \
   -e "s|^COMPOSE_FILE=.*|COMPOSE_FILE=docker-compose.yml:docker-compose.gpu.yml|" \
   -e "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$(openssl rand -hex 24)|" \
   -e "s|^MASTER_ENCRYPTION_KEY=.*|MASTER_ENCRYPTION_KEY=$MK|" \
