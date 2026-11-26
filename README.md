@@ -1,7 +1,7 @@
 # Codena Pilot – Begleitdateien (pilot-20261126)
 
-Alles, was die Deployment-Maschine neben den drei Images braucht. Images und Stand: Commit `03cc4e4`,
-Datenmodell 2.0.0, Migrationen bis `0051` (laufen beim ersten Start automatisch).
+Alles, was die Deployment-Maschine neben den drei Images braucht. Images und Stand: Commit `f8a9401`,
+Datenmodell 2.1.0, Migrationen bis `0052` (laufen beim ersten Start automatisch).
 
 Das Produkt hieß bis 25.11.2026 Doctus. **Bestehende Installation? Dann nur den Abschnitt „Umstieg von Doctus“ ausführen**,
 nicht den Ablauf für eine Neuinstallation.
