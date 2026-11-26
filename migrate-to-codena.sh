@@ -79,16 +79,22 @@ docker network rm doctus_default >/dev/null 2>&1 || true
 say "Codena starten"
 docker compose up -d --no-build
 
-printf 'Warte auf das Backend'
+# --noproxy: Ein HTTP(S)_PROXY in der Shell würde sonst auch localhost über den Firmenproxy schicken.
+# Gewartet wird auf /health/live (läuft der Prozess?); /health prüft zusätzlich den LLM-Endpunkt und
+# meldet 503, wenn ein Firmen-LLM dessen Modellliste nicht ausliefert – das ist kein Grund zum Abbruch.
+printf 'Warte auf das Backend (üblich: unter einer Minute)'
 i=0
-until curl -fsS http://localhost:8000/health >/dev/null 2>&1; do
+until curl -fsS --noproxy '*' http://localhost:8000/health/live >/dev/null 2>&1; do
   i=$((i + 1))
-  [ "$i" -lt 60 ] || { echo; fail "Backend nach 5 Minuten nicht gesund – docker compose logs backend-api prüfen"; }
+  [ "$i" -lt 60 ] || { echo; fail "Backend nach 5 Minuten nicht erreichbar – docker compose logs backend-api prüfen"; }
   printf '.'
   sleep 5
 done
 echo
-curl -fsS http://localhost:8000/version || true
+curl -sS --noproxy '*' http://localhost:8000/version || true
+echo
+echo "Zustand der Abhängigkeiten (ein Fehler nur beim LLM-Eintrag ist unkritisch, wenn der Chat funktioniert):"
+curl -sS --noproxy '*' http://localhost:8000/health || true
 echo
 docker compose ps
 cat <<EOF

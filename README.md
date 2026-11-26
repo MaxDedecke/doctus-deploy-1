@@ -71,14 +71,19 @@ docker logout ghcr.io
 cp .env /sicherer/ort/codena.env                     # sofort sichern: ohne MASTER_ENCRYPTION_KEY ist alles unlesbar
 
 docker compose up -d --no-build
-docker exec codena-ollama ollama pull hf.co/gpustack/bge-m3-GGUF:Q4_K_M
-docker exec codena-ollama ollama cp hf.co/gpustack/bge-m3-GGUF:Q4_K_M bge-m3
-docker exec codena-ollama ollama pull hf.co/lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M   # ~19 GB
-docker exec codena-ollama ollama cp hf.co/lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M qwen3-coder:30b
+docker exec -e OLLAMA_HOST=127.0.0.1:11434 codena-ollama ollama pull hf.co/gpustack/bge-m3-GGUF:Q4_K_M
+docker exec -e OLLAMA_HOST=127.0.0.1:11434 codena-ollama ollama cp hf.co/gpustack/bge-m3-GGUF:Q4_K_M bge-m3
+docker exec -e OLLAMA_HOST=127.0.0.1:11434 codena-ollama ollama pull hf.co/lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M   # ~19 GB
+docker exec -e OLLAMA_HOST=127.0.0.1:11434 codena-ollama ollama cp hf.co/lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M qwen3-coder:30b
 docker compose logs backend-api | grep -A3 "Erster Start" # Admin-Passwort, wird nur einmal angezeigt
 docker compose ps
-curl -fsS http://localhost:8000/health && curl -fsS http://localhost:8000/version
+curl -sS --noproxy '*' http://localhost:8000/health; curl -sS --noproxy '*' http://localhost:8000/version
 ```
+
+`-e OLLAMA_HOST=127.0.0.1:11434` ist hinter einem Firmenproxy nötig: Das Ollama-Image setzt `OLLAMA_HOST=0.0.0.0`,
+und diese Adresse nimmt Go nicht vom Proxy aus – ohne den Zusatz geht die CLI über den Proxy und meldet nur
+„something went wrong“. Aus demselben Grund `curl --noproxy '*'` für `localhost`. `/health` darf `degraded` zeigen,
+wenn allein der LLM-Eintrag fehlschlägt (manche Firmen-LLMs liefern keine Modellliste); entscheidend ist der Chat.
 
 `--no-build` ist Pflicht: Die Compose-Datei enthält Build-Abschnitte für Verzeichnisse, die es hier nicht gibt.
 
@@ -87,7 +92,7 @@ löscht man es über einen Container, z. B. `docker run --rm -v "$PWD/data:/d" a
 
 ## Prüfen
 
-- `docker exec codena-ollama ollama ps` nach der ersten Chatfrage: `PROCESSOR` muss „100% GPU“ zeigen, `CONTEXT`
+- `docker exec -e OLLAMA_HOST=127.0.0.1:11434 codena-ollama ollama ps` nach der ersten Chatfrage: `PROCESSOR` muss „100% GPU“ zeigen, `CONTEXT`
   65536. Steht dort ein CPU-Anteil, ist das Modell nicht ganz in den Grafikspeicher gekommen.
 - `nvidia-smi`: beide Karten (24 GB und 16 GB) belegt, zusammen rund 31 GB bei drei gleichzeitigen Anfragen.
 - In Codena unter Einstellungen > KI das Profil „Qwen3-Coder 30B“ öffnen: LLM-Context-Länge 65536; dann
